@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import io.ticketcoin.nfc.core.Reader;
 import io.ticketcoin.nfc.core.Reader.ReaderListener;
 import io.ticketcoin.nfc.display.LED;
+import io.ticketcoin.rest.response.TicketDTOResponseWrapper;
 import io.ticketcoin.util.RSClient;
 
 
@@ -86,9 +87,16 @@ public class NFCReader implements ReaderListener {
 		    response = channel.transmit(command);
 	
 	        byte[] byteArray = response.getData();
-	        clent.consumeCard( new String( byteArray ));
 	        
-	        led.setBackground(Color.RED);
+	        TicketDTOResponseWrapper res = clent.consumeCard( new String( byteArray ));
+	        if(res.isSuccess())
+	        	led.setBackground(Color.GREEN);
+	        else
+	        	led.setBackground(Color.RED);
+	        
+	        
+	        
+	        
 	        
 	        
 	        
