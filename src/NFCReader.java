@@ -87,17 +87,13 @@ public class NFCReader implements ReaderListener {
 		    response = channel.transmit(command);
 	
 	        byte[] byteArray = response.getData();
-	        
-	        TicketDTOResponseWrapper res = clent.consumeCard( new String( byteArray ));
+	        String cardID = new String( byteArray );
+	        System.out.println(cardID);
+	        TicketDTOResponseWrapper res = clent.consumeCard(cardID);
 	        if(res.isSuccess())
 	        	led.setBackground(Color.GREEN);
 	        else
 	        	led.setBackground(Color.RED);
-	        
-	        
-	        
-	        
-	        
 	        
 	        
 		}
