@@ -21,12 +21,13 @@ import io.ticketcoin.util.RSClient;
 public class NFCReader implements ReaderListener {  
     
 	public static final LED led=new LED(); 
-	public static RSClient clent= null;
+	public static RSClient client= null;
 	
   
     public static void main(String[] args)  {
     	
-    	clent = new RSClient(args[0], args[1]);
+    	client = new RSClient(args[0], args[1]);
+    	client.authenticate();
     	
         JFrame f = new JFrame("main");
         f.setSize(400, 300);
@@ -89,11 +90,12 @@ public class NFCReader implements ReaderListener {
 	        byte[] byteArray = response.getData();
 	        String cardID = new String( byteArray );
 	        System.out.println(cardID);
-	        TicketDTOResponseWrapper res = clent.consumeCard(cardID);
+	        
+	        TicketDTOResponseWrapper res = client.consumeCard(cardID);
 	        if(res.isSuccess())
-	        	led.setBackground(Color.GREEN);
+	        		led.setBackground(Color.GREEN);
 	        else
-	        	led.setBackground(Color.RED);
+	        		led.setBackground(Color.RED);
 	        
 	        
 		}
