@@ -1,4 +1,6 @@
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.List;
 
 import javax.smartcardio.Card;
@@ -9,10 +11,13 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
+import io.ticketcoin.dashboard.dto.TicketDTO;
 import io.ticketcoin.nfc.core.Reader;
 import io.ticketcoin.nfc.core.Reader.ReaderListener;
-import io.ticketcoin.nfc.display.LED;
 import io.ticketcoin.rest.response.TicketDTOResponseWrapper;
 import io.ticketcoin.util.RSClient;
 
@@ -20,20 +25,44 @@ import io.ticketcoin.util.RSClient;
 @SuppressWarnings("restriction")
 public class NFCReader implements ReaderListener {  
     
-	public static final LED led=new LED(); 
 	public static RSClient client= null;
 	
+	public static final JPanel led = new JPanel(); 
+	public static final JLabel title = new JLabel("");
+	public static final JLabel centralLabel = new JLabel("");
   
     public static void main(String[] args)  {
     	
     	client = new RSClient(args[0], args[1]);
     	client.authenticate();
     	
-        JFrame f = new JFrame("main");
-        f.setSize(400, 300);
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame f = new JFrame("NFC Reader");
+      
+        led.setBounds(0,0,800,400);    
+        led.setBackground(Color.gray);  
+        title.setBounds(0,0,800,30);    
+        title.setHorizontalAlignment(SwingConstants.CENTER);
+        title.setBackground(Color.yellow);   
+        title.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 50));
+             
+        centralLabel.setBounds(0,100,800,30);    
+        centralLabel.setBackground(Color.yellow);   
+        centralLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        centralLabel.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 60));
+     
+        
+        led.add(title); 
+        led.add(centralLabel);  
+        led.setBackground(Color.WHITE);
+        
+        led.setLayout(new GridLayout(4,1));  
+        
+        
         f.add(led);  
-        f.setVisible(true);
+                f.setSize(800,400);    
+                f.setLayout(null);    
+                f.setVisible(true);    
+                
         
 
         
@@ -93,14 +122,24 @@ public class NFCReader implements ReaderListener {
 	        
 	        TicketDTOResponseWrapper res = client.consumeCard(cardID);
 	        if(res.isSuccess())
+	        {
+	        		TicketDTO tDTO = (TicketDTO)res.getData();
+		    		title.setText(tDTO.getEventDetail().getName());
+		    		centralLabel.setText(tDTO.getAllowedEntrances().toString()); 
 	        		led.setBackground(Color.GREEN);
+	        }
 	        else
+	        {
+				title.setText("Accesso negato");
+				centralLabel.setText(""); 
 	        		led.setBackground(Color.RED);
-	        
+	        }
 	        
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			title.setText("Accesso negato");
+			centralLabel.setText(""); 
 			led.setBackground(Color.RED);
 		}
         
@@ -109,6 +148,8 @@ public class NFCReader implements ReaderListener {
 
 	@Override
 	public void removed() {
+		title.setText("");
+		centralLabel.setText(""); 
 		led.setBackground(Color.WHITE);
 	}
 }
